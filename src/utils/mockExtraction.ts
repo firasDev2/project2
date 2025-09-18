@@ -11,7 +11,7 @@ export async function extractRequirementsStream(
   formData.append("text_content", content);
 
   try {
-    const response = await fetch("http://localhost:8000/process-docx", {
+    const response = await fetch("http://127.0.0.1:8000/process-docx", {
       method: "POST",
       body: formData,
     });
