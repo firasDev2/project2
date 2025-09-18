@@ -5,11 +5,11 @@ import mammoth from "mammoth";
 
 interface DocumentUploadProps {
   onUpload: (content: string) => void;
+  onUseSample: () => void;
   isProcessing: boolean;
   llmThinking?: string; 
 }
 
-export const DocumentUpload: React.FC<DocumentUploadProps> = ({ 
   onUpload, 
   isProcessing,
   llmThinking = ""

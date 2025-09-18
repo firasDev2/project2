@@ -43,6 +43,76 @@ const handleDocumentUpload = async (content: string) => {
   }
 };
 
+  const handleSampleData = () => {
+    setProject(prev => ({ ...prev, extractionStatus: 'processing' }));
+    setLlmThinking("Analyzing sample e-commerce requirements...\nExtracting user stories...\nProcessing functional requirements...\n");
+    
+    // Simulate processing time
+    setTimeout(() => {
+      const sampleStories = [
+        {
+          id: 'story-1',
+          title: 'En tant qu\'utilisateur, je veux créer un compte pour accéder aux fonctionnalités personnalisées',
+          role: 'utilisateur',
+          feature: 'créer un compte',
+          benefit: 'accéder aux fonctionnalités personnalisées',
+          elements: [{
+            id: 'element-1',
+            category: 'user-story' as const,
+            content: 'En tant qu\'utilisateur, je veux créer un compte pour accéder aux fonctionnalités personnalisées',
+            sourceText: 'Le système doit permettre aux utilisateurs de créer un compte avec email et mot de passe',
+            confidence: 1,
+            validated: false,
+          }],
+          priority: 'high' as const,
+          status: 'extracted' as const,
+          modules: ['Authentication'],
+        },
+        {
+          id: 'story-2',
+          title: 'En tant qu\'utilisateur, je veux parcourir le catalogue de produits pour trouver des articles',
+          role: 'utilisateur',
+          feature: 'parcourir le catalogue',
+          benefit: 'trouver des articles',
+          elements: [{
+            id: 'element-2',
+            category: 'user-story' as const,
+            content: 'En tant qu\'utilisateur, je veux parcourir le catalogue de produits pour trouver des articles',
+            sourceText: 'Le catalogue doit afficher tous les produits disponibles avec filtres et recherche',
+            confidence: 1,
+            validated: false,
+          }],
+          priority: 'high' as const,
+          status: 'extracted' as const,
+          modules: ['Product Catalog'],
+        },
+        {
+          id: 'story-3',
+          title: 'En tant qu\'utilisateur, je veux ajouter des produits au panier pour les acheter plus tard',
+          role: 'utilisateur',
+          feature: 'ajouter au panier',
+          benefit: 'acheter plus tard',
+          elements: [{
+            id: 'element-3',
+            category: 'user-story' as const,
+            content: 'En tant qu\'utilisateur, je veux ajouter des produits au panier pour les acheter plus tard',
+            sourceText: 'Le système doit permettre d\'ajouter, modifier et supprimer des articles du panier',
+            confidence: 1,
+            validated: false,
+          }],
+          priority: 'medium' as const,
+          status: 'extracted' as const,
+          modules: ['Shopping Cart'],
+        }
+      ];
+      
+      setProject(prev => ({
+        ...prev,
+        userStories: sampleStories,
+        extractionStatus: 'completed'
+      }));
+    }, 2000);
+  };
   
 
   const validatedCount = project.userStories.filter(story => story.status === 'validated').length;
@@ -64,6 +134,7 @@ const handleDocumentUpload = async (content: string) => {
         {project.userStories.length === 0 ? (
           <DocumentUpload
             onUpload={handleDocumentUpload}
+            onUseSample={handleSampleData}
             isProcessing={project.extractionStatus === 'processing'}
             llmThinking={llmThinking} // 👈 pass live text
           />
