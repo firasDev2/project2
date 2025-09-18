@@ -53,7 +53,47 @@ const handleFile = (file: File) => {
     }
   };
 
-  const sampleDocument = `# Software Requirements Specification: E-commerce Platform\n...`; // shortened for brevity
+  const sampleDocument = `# Software Requirements Specification: E-commerce Platform
+
+## 1. User Management
+En tant qu'utilisateur, je veux créer un compte pour pouvoir accéder aux fonctionnalités personnalisées de la plateforme.
+
+Le système doit permettre aux clients de créer un compte utilisateur avec email et mot de passe.
+Les utilisateurs doivent pouvoir se connecter et se déconnecter de leur compte.
+Un utilisateur doit pouvoir réinitialiser son mot de passe en cas d'oubli.
+
+## 2. Catalogue Produits
+En tant que client, je veux parcourir le catalogue de produits pour découvrir les articles disponibles.
+
+Le système doit afficher une liste de produits avec photos, descriptions et prix.
+Les utilisateurs doivent pouvoir filtrer les produits par catégorie, prix et marque.
+Un système de recherche doit permettre de trouver des produits par mots-clés.
+
+## 3. Panier d'Achat
+En tant que client, je veux ajouter des produits à mon panier pour préparer ma commande.
+
+Les utilisateurs doivent pouvoir ajouter des produits à leur panier.
+Le panier doit afficher le total des articles et le prix total.
+Les clients doivent pouvoir modifier les quantités ou supprimer des articles du panier.
+
+## 4. Processus de Commande
+En tant que client, je veux finaliser ma commande pour recevoir mes produits.
+
+Un client doit avoir la possibilité de passer commande depuis son panier.
+Le système doit collecter les informations de livraison et de facturation.
+Un client doit avoir la possibilité de payer en ligne avec une carte bancaire.
+
+## 5. Administration
+En tant qu'administrateur, je veux gérer le catalogue pour maintenir l'offre produits à jour.
+
+Les administrateurs doivent gérer le stock et mettre à jour les fiches produits.
+Le système doit permettre d'ajouter, modifier ou supprimer des produits.
+Les administrateurs doivent pouvoir consulter les commandes et leur statut.
+
+## 6. Sécurité
+Le système doit chiffrer les données sensibles des utilisateurs.
+Les paiements doivent être sécurisés selon les standards PCI DSS.
+Un système d'authentification robuste doit protéger les comptes utilisateurs.`;
 
   const handleSampleUpload = () => {
     onUpload(sampleDocument);
