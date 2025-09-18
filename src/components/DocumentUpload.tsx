@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { Upload, FileText, Loader2 } from 'lucide-react';
+import mammoth from "mammoth";
+
 
 interface DocumentUploadProps {
   onUpload: (content: string) => void;
   isProcessing: boolean;
+  llmThinking?: string; 
 }
 
-export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUpload, isProcessing }) => {
+export const DocumentUpload: React.FC<DocumentUploadProps> = ({ 
+  onUpload, 
+  isProcessing,
+  llmThinking = ""
+}) => {
   const [dragActive, setDragActive] = useState(false);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -20,14 +27,24 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUpload, isProc
     }
   };
 
-  const handleFile = (file: File) => {
+const handleFile = (file: File) => {
+  if (file.name.endsWith(".docx")) {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const arrayBuffer = e.target?.result as ArrayBuffer;
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      onUpload(result.value); // Extracted text
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
       onUpload(content);
     };
     reader.readAsText(file);
-  };
+  }
+};
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -36,57 +53,13 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUpload, isProc
     }
   };
 
-  const sampleDocument = `# Software Requirements Specification: E-commerce Platform
-
-## User Stories
-
-### US-001: User Registration
-As a new customer, I want to create an account so that I can make purchases and track my orders.
-
-**Business Need:** Increase customer retention by allowing users to save preferences and order history.
-
-**Acceptance Criteria:**
-- User can register with email and password
-- Email verification is required before account activation
-- Password must meet security requirements (8+ characters, mixed case, numbers)
-- User receives welcome email after successful registration
-
-**Dependencies:** Email service integration, user database schema
-
-**Technical Details:** 
-- Implement OAuth2 for social login options
-- Use bcrypt for password hashing
-- Rate limiting for registration attempts
-
-### US-002: Product Search
-As a customer, I want to search for products by name or category so that I can quickly find what I need.
-
-**Business Context:** Improve user experience and reduce bounce rate
-
-**Acceptance Criteria:**
-- Search bar accepts text input and displays results in real-time
-- Results can be filtered by price, rating, category
-- Search suggestions appear as user types
-- No results found page displays alternative suggestions
-
-**Out of Scope:** Voice search functionality
-
-**Testing:** 
-- Unit tests for search algorithm
-- Performance testing with large product catalogs
-- A/B testing different search result layouts
-
-**Security:** Input sanitization to prevent SQL injection
-
-**Definition of Done:**
-- Feature tested in staging environment
-- Performance benchmarks met
-- Accessibility standards compliant
-- Documentation updated`;
+  const sampleDocument = `# Software Requirements Specification: E-commerce Platform\n...`; // shortened for brevity
 
   const handleSampleUpload = () => {
     onUpload(sampleDocument);
   };
+
+  
 
   return (
     <div className="flex-1 flex items-center justify-center bg-gray-50">
@@ -113,9 +86,19 @@ As a customer, I want to search for products by name or category so that I can q
             <div className="space-y-4">
               <Loader2 className="w-12 h-12 text-blue-600 mx-auto animate-spin" />
               <div>
-                <h3 className="text-lg font-medium text-gray-900">Processing Document</h3>
-                <p className="text-gray-500">Extracting requirements using AI...</p>
+                <h3 className="text-lg font-medium text-gray-900">
+                  Processing Document
+                </h3>
+                <p className="text-gray-500">The AI is thinking...</p>
               </div>
+
+              {/* 👇 Live LLM thinking area */}
+              {llmThinking && (
+                <div className="mt-4 text-left bg-gray-100 rounded-lg p-3 max-h-48 overflow-y-auto text-sm text-gray-700 font-mono">
+                  <div className="whitespace-pre-wrap">{llmThinking}</div>
+                  <div className="animate-pulse">▋</div>
+                </div>
+              )}
             </div>
           ) : (
             <>

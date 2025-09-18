@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Check, X, AlertTriangle, Trash2, Edit3 } from 'lucide-react';
+import { ChevronDown, ChevronRight, Check, X, AlertTriangle, Trash2, Edit3, Sparkles, Bot } from 'lucide-react';
 import { UserStory, RequirementElement } from '../types/requirements';
 
 interface RequirementCardProps {
@@ -7,6 +7,7 @@ interface RequirementCardProps {
   onUpdate: (userStory: UserStory) => void;
   onDelete: (userStoryId: string) => void;
   onSelectElement: (element: RequirementElement) => void;
+  onOpenAIChat: (userStory: UserStory) => void;
 }
 
 const categoryColors = {
@@ -49,7 +50,8 @@ export const RequirementCard: React.FC<RequirementCardProps> = ({
   userStory,
   onUpdate,
   onDelete,
-  onSelectElement
+  onSelectElement,
+  onOpenAIChat
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [editingField, setEditingField] = useState<string | null>(null);
@@ -104,39 +106,41 @@ export const RequirementCard: React.FC<RequirementCardProps> = ({
     field: string;
     className?: string;
     placeholder?: string;
-   inline?: boolean;
+    multiline?: boolean;
   }> = ({ value, field, className = '', placeholder }) => {
     const isEditing = editingField === field;
     
     if (isEditing) {
       return (
-       <div className="inline-flex items-center space-x-2">
-          <input
-            type="text"
+        <div className="flex items-start space-x-2 w-full">
+          <textarea
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
-           className={`px-2 py-1 border-2 border-blue-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-[120px] ${className}`}
+            className={`px-3 py-2 border-2 border-blue-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none w-full min-h-[2.5rem] ${className}`}
             placeholder={placeholder}
             autoFocus
+            rows={Math.max(2, Math.ceil(editValue.length / 50))}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSave();
+              if (e.key === 'Enter' && e.ctrlKey) handleSave();
               if (e.key === 'Escape') handleCancel();
             }}
           />
-          <button 
-            onClick={handleSave} 
-            className="p-1 text-green-600 hover:bg-green-50 rounded-full transition-colors"
-            title="Save (Enter)"
-          >
-            <Check className="w-4 h-4" />
-          </button>
-          <button 
-            onClick={handleCancel} 
-            className="p-1 text-red-600 hover:bg-red-50 rounded-full transition-colors"
-            title="Cancel (Esc)"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex flex-col space-y-1 mt-1">
+            <button 
+              onClick={handleSave} 
+              className="p-1.5 text-green-600 hover:bg-green-50 rounded-md transition-colors"
+              title="Save (Ctrl+Enter)"
+            >
+              <Check className="w-4 h-4" />
+            </button>
+            <button 
+              onClick={handleCancel} 
+              className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+              title="Cancel (Esc)"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       );
     }
@@ -144,13 +148,13 @@ export const RequirementCard: React.FC<RequirementCardProps> = ({
     return (
       <div
         onClick={() => handleEdit(field, value)}
-       className={`cursor-text hover:bg-blue-50 hover:border-blue-200 border-2 border-transparent rounded px-2 py-1 transition-all duration-200 group inline-block ${className}`}
+        className={`cursor-text hover:bg-blue-50 hover:border-blue-200 border-2 border-transparent rounded-md px-3 py-2 transition-all duration-200 group ${className}`}
         title="Click to edit"
       >
-        <span className="group-hover:text-blue-700 transition-colors">
+        <span className="group-hover:text-blue-700 transition-colors whitespace-pre-wrap">
           {value || placeholder}
         </span>
-        <Edit3 className="w-3 h-3 text-blue-400 opacity-0 group-hover:opacity-100 inline ml-2 transition-opacity" />
+        <Edit3 className="w-3 h-3 text-blue-400 opacity-0 group-hover:opacity-100 inline-block ml-2 transition-opacity" />
       </div>
     );
   };
@@ -223,6 +227,24 @@ export const RequirementCard: React.FC<RequirementCardProps> = ({
           <div className={`flex items-center space-x-2 transition-all duration-300 ${
             isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
           }`}>
+            {/* AI Chat Button */}
+            <button
+              onClick={() => onOpenAIChat(userStory)}
+              className="group relative p-2 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white rounded-full transition-all duration-300 hover:shadow-lg hover:scale-110"
+              title="Analyze with AI"
+            >
+              <div className="relative">
+                <Bot className="w-4 h-4" />
+                <Sparkles className="w-2 h-2 absolute -top-1 -right-1 text-yellow-300 animate-pulse" />
+              </div>
+              
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                Analyze with AI
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-900"></div>
+              </div>
+            </button>
+            
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -277,31 +299,31 @@ export const RequirementCard: React.FC<RequirementCardProps> = ({
         </div>
 
         {/* Editable User Story Format */}
-        <div className="text-sm text-gray-600 mb-4 space-y-1">
-          <div className="flex flex-wrap items-center gap-1">
+        <div className="text-sm text-gray-600 mb-4 space-y-2">
+          <div className="flex items-start gap-1">
             <span>As a </span>
             <EditableText
               value={userStory.role}
               field="role"
-              className="font-medium text-gray-800 inline-block min-w-[60px]"
+              className="font-medium text-gray-800 flex-1"
               placeholder="role"
             />
           </div>
-          <div className="flex flex-wrap items-center gap-1">
+          <div className="flex items-start gap-1">
             <span>I want </span>
             <EditableText
               value={userStory.feature}
               field="feature"
-              className="font-medium text-gray-800 inline-block min-w-[100px]"
+              className="font-medium text-gray-800 flex-1"
               placeholder="feature description"
             />
           </div>
-          <div className="flex flex-wrap items-center gap-1">
+          <div className="flex items-start gap-1">
             <span>So that </span>
             <EditableText
               value={userStory.benefit}
               field="benefit"
-              className="font-medium text-gray-800 inline-block min-w-[100px]"
+              className="font-medium text-gray-800 flex-1"
               placeholder="benefit description"
             />
           </div>

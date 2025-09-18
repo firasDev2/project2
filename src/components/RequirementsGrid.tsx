@@ -7,13 +7,15 @@ interface RequirementsGridProps {
   onUpdateUserStory: (userStory: UserStory) => void;
   onDeleteUserStory: (userStoryId: string) => void;
   onSelectElement: (element: RequirementElement) => void;
+  onOpenAIChat: (userStory: UserStory) => void;
 }
 
 export const RequirementsGrid: React.FC<RequirementsGridProps> = ({
   userStories,
   onUpdateUserStory,
   onDeleteUserStory,
-  onSelectElement
+  onSelectElement,
+  onOpenAIChat
 }) => {
   if (userStories.length === 0) {
     return (
@@ -42,6 +44,7 @@ export const RequirementsGrid: React.FC<RequirementsGridProps> = ({
               onUpdate={onUpdateUserStory}
               onDelete={onDeleteUserStory}
               onSelectElement={onSelectElement}
+              onOpenAIChat={onOpenAIChat}
             />
           ))}
         </div>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test DOCX Upload</title>
+</head>
+<body>
+  <h1>Upload a DOCX</h1>
+  <input type="file" id="fileInput" />
+  <button onclick="uploadFile()">Upload</button>
+  <pre id="output"></pre>
+
+<script>
+  async function uploadFile() {
+    const fileInput = document.getElementById("fileInput");
+    if (fileInput.files.length === 0) {
+      alert("Pick a DOCX first!");
+      return;
+    }
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/process-docx/", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error("HTTP " + res.status);
+      }
+
+      const data = await res.json();
+      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+
+    } catch (err) {
+      console.error("Caught error:", err);
+      document.getElementById("output").textContent = "⚠️ Error occurred, but check console for details.";
+    }
+  }
+</script>
+
+</body>
+</html>
