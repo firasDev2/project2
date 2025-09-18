@@ -186,4 +186,4 @@ Un système d'authentification robuste doit protéger les comptes utilisateurs.`
   );
 };
 
-export default DocumentUpload;
+export { DocumentUpload };
